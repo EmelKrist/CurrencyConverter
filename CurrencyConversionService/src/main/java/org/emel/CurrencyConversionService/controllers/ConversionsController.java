@@ -1,0 +1,75 @@
+package org.emel.CurrencyConversionService.controllers;
+
+import org.emel.CurrencyConversionService.dto.ConversionInputDataDTO;
+import org.emel.CurrencyConversionService.dto.ConversionResultDTO;
+import org.emel.CurrencyConversionService.models.Conversion;
+import org.emel.CurrencyConversionService.services.ConversionsService;
+import org.emel.CurrencyConversionService.util.CurrencyRateIsNotSupported;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+/**
+ * REST контроллер для работы с конвертациями
+ */
+@RestController
+@RequestMapping("/conversions")
+public class ConversionsController {
+
+    private final Logger log = LoggerFactory.getLogger(ConversionsController.class);
+    private final ConversionsService conversionsService;
+    private final ModelMapper modelMapper;
+
+    @Autowired
+    public ConversionsController(ConversionsService conversionsService,
+                                 ModelMapper modelMapper) {
+        this.conversionsService = conversionsService;
+        this.modelMapper = modelMapper;
+    }
+
+    /**
+     * POST-запрос на конвертацию
+     *
+     * @param conversionInputDataDTO данные конвертации от клиента
+     * @return ответ с результатом конвертации в json формате
+     */
+    @PostMapping("/new")
+    public ResponseEntity<ConversionResultDTO> convert(@RequestBody ConversionInputDataDTO conversionInputDataDTO) {
+        log.debug("Gets REST request to convert data : {}", conversionInputDataDTO);
+        // конвертируем входные данные
+        Optional<Conversion> conversion = conversionsService.convert(convertToConversion(conversionInputDataDTO));
+        // если конвертация получена(существует), сохраняем в БД и возвращаем результат клиенту
+        if (conversion.isPresent()) {
+            conversionsService.save(conversion.get());
+            return ResponseEntity.ok().body(convertToConversionResultDTO(conversion.get()));
+        } else { // в противном случае указываем, что заданная конвертация невозможна
+            log.debug("Failed to get data from Coingate REST API");
+            throw new CurrencyRateIsNotSupported("Выбранная валютная ставка не поддерживается!");
+        }
+    }
+
+    /**
+     * Метод конвертации объекта ConversionInputDataDTO в объект модели Conversion
+     *
+     * @param conversionInputDataDTO объект передачи данных от клиента
+     * @return объект модели Conversion
+     */
+    private Conversion convertToConversion(ConversionInputDataDTO conversionInputDataDTO) {
+        return modelMapper.map(conversionInputDataDTO, Conversion.class);
+    }
+
+    /**
+     * Метод конвертации объекта модели Conversion в объект ConversionResultDTO
+     *
+     * @param conversion объект модели Conversion
+     * @return объект передачи данных клиенту
+     */
+    private ConversionResultDTO convertToConversionResultDTO(Conversion conversion) {
+        return modelMapper.map(conversion, ConversionResultDTO.class);
+    }
+}
