@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -28,6 +29,17 @@ public class ConversionsService {
     @Autowired
     public ConversionsService(ConversionsRepository conversionsRepository) {
         this.conversionsRepository = conversionsRepository;
+    }
+
+    /**
+     * Метод для получения списка всех конвертаций (отсортированный по времени конвертации)
+     *
+     * @return список конвертаций
+     */
+    @Transactional(readOnly = true)
+    public List<Conversion> findAll() {
+        log.debug("Gets all conversions from the database");
+        return conversionsRepository.findAllByOrderByConvertedAtDesc();
     }
 
     /**

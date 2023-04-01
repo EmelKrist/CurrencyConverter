@@ -3,15 +3,34 @@ package org.emel.CurrencyConversionService.dto;
 import java.time.LocalDateTime;
 
 /**
- * Класс передачи данных с результатом конвертации клиенту
+ * Класс объекта передачи данных для модели Conversion
  */
-public class ConversionResultDTO {
+public class ConversionDTO {
+    private String fromCurrency;
+    private String toCurrency;
     private double currencyRate;
+    private int quantity;
     private double totalResult;
     private LocalDateTime convertedAt;
 
-    public ConversionResultDTO() {
+    public ConversionDTO(){
 
+    }
+
+    public String getFromCurrency() {
+        return fromCurrency;
+    }
+
+    public void setFromCurrency(String fromCurrency) {
+        this.fromCurrency = fromCurrency;
+    }
+
+    public String getToCurrency() {
+        return toCurrency;
+    }
+
+    public void setToCurrency(String toCurrency) {
+        this.toCurrency = toCurrency;
     }
 
     public double getCurrencyRate() {
@@ -20,6 +39,14 @@ public class ConversionResultDTO {
 
     public void setCurrencyRate(double currencyRate) {
         this.currencyRate = currencyRate;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public double getTotalResult() {
