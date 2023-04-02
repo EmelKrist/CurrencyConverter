@@ -1,8 +1,12 @@
 package org.emel.ClientService.services;
 
+import org.emel.ClientService.models.Currency;
 import org.emel.ClientService.repositories.CurrenciesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Сервис для сущности Currency
@@ -14,5 +18,15 @@ public class CurrenciesService {
     @Autowired
     public CurrenciesService(CurrenciesRepository currenciesRepository) {
         this.currenciesRepository = currenciesRepository;
+    }
+
+    /**
+     * Метод для получения списка всех доступных клиенту валют из БД
+     *
+     * @return список доступных валют
+     */
+    @Transactional(readOnly = true)
+    public List<Currency> findAll() {
+        return currenciesRepository.findAll();
     }
 }

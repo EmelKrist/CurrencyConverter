@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Currency converter</title>
+</head>
+<body>
+<!-- POST-запрос для инициализации и запуска конвертации -->
+<form th:method="POST" th:action="@{/}" th:object="${conversion}">
+    <!-- Всплывающее меню выбора валюты, ИЗ которой конвертируется сумма -->
+    <label for="fromCurrency">Из</label>
+    <select th:field="*{fromCurrency}" id="fromCurrency">
+        <!-- список доступных валют из БД -->
+        <option th:each="currency : ${currencies}"
+                th:value="${currency.getCode()}"
+                th:text="${currency.getName() + '(' + currency.getCode() + ')'}">SelectedFromCurrency
+        </option>
+    </select>
+    <br/>
+    <!-- Всплывающее меню выбора валюты, В которую конвертируется сумма -->
+    <label for="toCurrency">В</label>
+    <select th:field="*{toCurrency}" id="toCurrency">
+        <!-- список доступных валют из БД -->
+        <option th:each="currency : ${currencies}"
+                th:value="${currency.getCode()}"
+                th:text="${currency.getName() + '(' + currency.getCode() + ')'}">SelectedToCurrency
+        </option>
+    </select>
+    <br/>
+    <!-- Поле для ввода конвертируемой суммы -->
+    <label for="quantity">Сумма:</label>
+    <input type="text" th:field="*{quantity}" id="quantity">
+    <br/>
+    <!-- Кнопка подтверждения отправки формы -->
+    <input type="submit" value="Конвертировать">
+</form>
+<!-- Текст: если в модели в атрибуте конвертации есть дата конвертации,
+ то выводим результат, иначе пустая строка -->
+<span th:text="${conversion.getConvertedAt() != null} ?
+ ${conversion.getQuantity() + ' ' + conversion.getFromCurrency() + ' = '
+ + conversion.getTotalResult() + ' ' + conversion.getToCurrency()} : ''">
+   someValue
+</span>
+
+</body>
+</html>

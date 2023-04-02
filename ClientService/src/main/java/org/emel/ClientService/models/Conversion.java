@@ -11,7 +11,7 @@ public class Conversion {
     private double currencyRate;
     private int quantity;
     private double totalResult;
-    private LocalDateTime convertedAt;
+    private LocalDateTime convertedAt = null;
 
     public Conversion(){
 
