@@ -54,7 +54,7 @@ public class ConversionsController {
      * @param conversionInputDataDTO данные конвертации от клиента
      * @return ответ с результатом конвертации в json формате
      */
-    @PostMapping("/new")
+    @PostMapping()
     public ResponseEntity<ConversionDTO> convert(@RequestBody ConversionInputDataDTO conversionInputDataDTO) {
         log.debug("Gets REST request to convert data : {}", conversionInputDataDTO);
         // конвертируем входные данные
