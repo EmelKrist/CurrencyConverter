@@ -5,21 +5,25 @@ import org.emel.ClientService.dto.ConversionsResponse;
 import org.emel.ClientService.models.Conversion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Сервис для клиента
  */
 @Service
 public class ClientService {
+
+    @Value("${microservice-currency-conversion.url}")
+    private String url;
 
     private final Logger log = LoggerFactory.getLogger(ClientService.class);
 
@@ -30,32 +34,40 @@ public class ClientService {
      * @return объект конвертации с результатом от сервиса конвертации валют
      */
     public Conversion getConvert(ConversionInputDataDTO conversionInputDataDTO) {
-        //TODO вынести urk и порт во внешний файл
-        final var url = "http://localhost:8080/conversions";
-        final var headers = new HttpHeaders(); // header запроса (указываем, что формат Запроса - json данные)
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        try { // TODO отделить отправку запроса и обработку сущности ответа от сервиса конвертации валют
-            // отправляем запрос сервису конвертации валют и получаем ответ в виде сущности ответа
-            final var request = new HttpEntity<>(conversionInputDataDTO, headers);
-            RestTemplate restTemplate = new RestTemplate();
-            final var responseEntity = restTemplate.postForEntity(url, request, Conversion.class);
-            //TODO проработать нормальную обработку ошибок и вывод их в логи, а также в веб. интерфейс
-
+        log.debug("Converts for input: {}", conversionInputDataDTO);
+        try {
+            final var responseEntity = sendPostHttpRequestForConversion(conversionInputDataDTO);
             // если в сущности обнаружена ошибка, то выбрасываем исключение
             if (responseEntity.getStatusCode().isError()) {
                 throw new RuntimeException(responseEntity.getStatusCode().getReasonPhrase());
             }
-            // если у сущности есть тело (json), возвращаем (Jackson сконвертирует в объект)
+            // если у сущности есть тело (json)
             if (responseEntity.hasBody()) {
+                log.debug("Successful conversion response from the currency conversion service");
                 return responseEntity.getBody();
             }
         } catch (Exception e) {
-            // если выброшено исключение, выводим сообщение
-            System.out.println("Ошибка " + e.getMessage());
+            /* TODO добавить поле для хранения ошибки (в контроллере проверять на null),
+                в случае null Добавлять на представление метку с сообщением об ошибке */
+            log.debug("Program error because of{}", e.getMessage());
         }
-        // если у ответа нет тела, возвращаем null
         return null;
+    }
+
+    /**
+     * Метод отправки POST HTTP Запроса для конвертации на стороне сервиса конвертации валют
+     *
+     * @param conversionInputDataDTO входные данные для конвертации
+     * @return ответ от сервиса конвертации валют
+     */
+    private ResponseEntity<Conversion> sendPostHttpRequestForConversion(ConversionInputDataDTO conversionInputDataDTO) {
+        log.debug("Sends an HTTP POST request to the currency conversion service for conversion");
+        final var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        // отправляем запрос сервису конвертации валют и получаем ответ в виде сущности ответа
+        final var request = new HttpEntity<>(conversionInputDataDTO, headers);
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.postForEntity(url, request, Conversion.class);
     }
 
     /**
@@ -64,27 +76,36 @@ public class ClientService {
      * @return список с конвертациями
      */
     public List<Conversion> getListOfConversions() {
-        // TODO вынести во внешний файл url
-        final var url = "http://localhost:8080/conversions";
+        log.debug("Gets a list of conversions");
+        try {
+            final var responseEntity = sendGetHttpRequestToGetListOfConversions();
 
-        try { // TODO отделить отправку запроса и обработку сущности ответа от сервиса конвертации валют
-            // отправляем запрос сервису конвертации валют для получения истории конвертаций
-            RestTemplate restTemplate = new RestTemplate();
-            final var responseEntity = restTemplate.getForEntity(url, ConversionsResponse.class);
-            //TODO проработать нормальную обработку ошибок и вывод их в логи, а также в веб. интерфейс
-
-            // если в вернувшемся ответе ошибка, то выбрасываем исключение
             if (responseEntity.getStatusCode().isError()) {
                 throw new RuntimeException(responseEntity.getStatusCode().getReasonPhrase());
             }
-            // если ошибки нет и есть тело у сущности ответа, возвращаем его, получая список
+
             if (responseEntity.hasBody()) {
+                log.debug("Successfully getting a list of conversions from the currency conversion service");
                 return responseEntity.getBody().getConversions();
             }
         } catch (Exception e) {
-            // если выброшено исключение, выводим сообщение
-            System.out.println("Ошибка " + e.getMessage());
+            /* TODO добавить поле для хранения ошибки (в контроллере проверять на null),
+                в случае null Добавлять на представление метку с сообщением об ошибке */
+            log.debug("Program error because of{}", e.getMessage());
         }
-        return Collections.emptyList(); // в противном случае возвращаем пустой список
+        return null; // в противном случае возвращаем пустой список
+    }
+
+    /**
+     * Метод для отправки GET HTTP запроса для получения списка конвертаций
+     * от сервиса конвертации валют
+     *
+     * @return ответ от сервиса конвертации валют
+     */
+    private ResponseEntity<ConversionsResponse> sendGetHttpRequestToGetListOfConversions() {
+        log.debug("Sends an HTTP GET request to the currency conversion service to get list of conversions");
+        // отправляем запрос сервису конвертации валют для получения истории конвертаций
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForEntity(url, ConversionsResponse.class);
     }
 }

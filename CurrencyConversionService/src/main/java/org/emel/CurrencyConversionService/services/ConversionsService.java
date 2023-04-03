@@ -65,8 +65,10 @@ public class ConversionsService {
         String rate = sendHttpRequestToGetCurrencyRate(conversion.getFromCurrency(), conversion.getToCurrency());
         if (rate != null) { // если она существует
             // конвертируем данные
+            // TODO сделать округление результатов вычислений до 2 знаков после запятой
             conversion.setCurrencyRate(Double.parseDouble(rate));
             conversion.setTotalResult(calcConversionResult(conversion.getCurrencyRate(), conversion.getQuantity()));
+            // TODO сделать форматирование даты и приветси к виду (дата часы:минуты)
             conversion.setConvertedAt(LocalDateTime.now());
             return Optional.of(conversion); // конвертация с результатами
         }

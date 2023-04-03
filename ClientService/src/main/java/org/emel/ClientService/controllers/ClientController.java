@@ -83,6 +83,7 @@ public class ClientController {
     public String historyPage(Model model) {
         // получаем список конвертаций из БД
         model.addAttribute("conversions", clientService.getListOfConversions());
+        //TODO сделать обработку ошибок с выводом сообщения от сервиса конвертации валют
         return "client/history";
     }
 
