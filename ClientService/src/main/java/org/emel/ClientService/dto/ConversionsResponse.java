@@ -10,8 +10,7 @@ import java.util.List;
 public class ConversionsResponse {
     private List<Conversion> conversions;
 
-    public ConversionsResponse(List<Conversion> conversions) {
-        this.conversions = conversions;
+    public ConversionsResponse() {
     }
 
     public List<Conversion> getConversions() {

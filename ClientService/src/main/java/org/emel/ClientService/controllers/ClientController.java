@@ -53,7 +53,7 @@ public class ClientController {
     @PostMapping()
     public String convert(@ModelAttribute("conversion") Conversion conversion, Model model) {
         //TODO сделать валидацию полей ввода
-        
+
         // конвертируем данные, полученных из формы в объекте конвертации
         Conversion conversionResult = clientService.getConvert(convertToConversionInputDataDTO(conversion));
         if (conversionResult != null) { // если результат конвертации существует
@@ -64,6 +64,19 @@ public class ClientController {
         }
         return "redirect:/"; // если результата нет, то редирект на пустую форму
         //TODO сделать обработку ошибок с выводом сообщения от сервиса конвертации валют
+    }
+
+    /**
+     * GET-запрос для получения истории конвертаций
+     *
+     * @param model модель представления
+     * @return представление с историей конвертаций
+     */
+    @GetMapping("/history")
+    public String historyPage(Model model) {
+        // получаем список конвертаций из БД
+        model.addAttribute("conversions", clientService.getListOfConversions());
+        return "client/history";
     }
 
     /**

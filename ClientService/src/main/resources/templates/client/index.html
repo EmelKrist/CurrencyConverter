@@ -41,6 +41,9 @@
  + conversion.getTotalResult() + ' ' + conversion.getToCurrency()} : ''">
    someValue
 </span>
-
+<!-- GET-запрос на получение формы с историей конвертаций -->
+<form th:method="GET" th:action="@{/history}">
+    <input type="submit" value="История">
+</form>
 </body>
 </html>
