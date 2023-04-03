@@ -29,7 +29,8 @@
     <br/>
     <!-- Поле для ввода конвертируемой суммы -->
     <label for="quantity">Сумма:</label>
-    <input type="text" th:field="*{quantity}" id="quantity">
+    <input type="number" th:field="*{quantity}" id="quantity" required value="1">
+    <div style="color:red" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">quantity Error</div>
     <br/>
     <!-- Кнопка подтверждения отправки формы -->
     <input type="submit" value="Конвертировать">

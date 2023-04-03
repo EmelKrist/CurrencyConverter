@@ -1,5 +1,6 @@
 package org.emel.ClientService.models;
 
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 /**
@@ -9,7 +10,8 @@ public class Conversion {
     private String fromCurrency;
     private String toCurrency;
     private double currencyRate;
-    private int quantity;
+    @Min(value = 1, message = "Сумма конвертации должна быть больше 0!")
+    private int quantity = 1;
     private double totalResult;
     private LocalDateTime convertedAt = null;
 

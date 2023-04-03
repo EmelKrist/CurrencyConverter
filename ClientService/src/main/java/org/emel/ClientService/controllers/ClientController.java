@@ -8,9 +8,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.validation.Valid;
 
 
 /**
@@ -51,8 +54,12 @@ public class ClientController {
      * @return на форму с результатом конвертации
      */
     @PostMapping()
-    public String convert(@ModelAttribute("conversion") Conversion conversion, Model model) {
-        //TODO сделать валидацию полей ввода
+    public String convert(@ModelAttribute("conversion") @Valid Conversion conversion,
+                          BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()){ // если есть ошибки валидации
+            model.addAttribute("currencies", currenciesService.findAll());
+            return "client/index"; // возвращаем представление
+        }
 
         // конвертируем данные, полученных из формы в объекте конвертации
         Conversion conversionResult = clientService.getConvert(convertToConversionInputDataDTO(conversion));
@@ -60,7 +67,7 @@ public class ClientController {
             // добавляем в модель представления список доступных валют и объект конвертации(с результатом)
             model.addAttribute("conversion", conversionResult);
             model.addAttribute("currencies", currenciesService.findAll());
-            return "client/index"; // возвращаем представление
+            return "client/index";
         }
         return "redirect:/"; // если результата нет, то редирект на пустую форму
         //TODO сделать обработку ошибок с выводом сообщения от сервиса конвертации валют
