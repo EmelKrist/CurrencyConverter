@@ -2,13 +2,13 @@ package org.emel.CurrencyConversionService.services;
 
 import org.emel.CurrencyConversionService.models.Conversion;
 import org.emel.CurrencyConversionService.util.CurrencyRateIsNotSupported;
+import org.emel.CurrencyConversionService.util.ExchangeRateRestApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -51,9 +51,12 @@ public class ConversionsService {
      * @return строковая валютная ставка
      */
     private String sendHttpRequestToGetCurrencyRate(String from, String to) {
-        log.debug("Sends a GET HTTP request to get exchange rate from {} to {} from Coingate REST API", from, to);
-        return new RestTemplate().getForObject(String.format("%s/%s/%s", this.url, from, to), String.class);
-        //TODO: сделать обработку ошибок в случае отказа Coingate REST API
+        try {
+            log.debug("Sends a GET HTTP request to get exchange rate from {} to {} from Coingate REST API", from, to);
+            return new RestTemplate().getForObject(String.format("%s/%s/%s", this.url, from, to), String.class);
+        } catch (HttpServerErrorException e){
+            throw new ExchangeRateRestApiException("Сервис получения валютной ставки недоступен!");
+        }
     }
 
     /**

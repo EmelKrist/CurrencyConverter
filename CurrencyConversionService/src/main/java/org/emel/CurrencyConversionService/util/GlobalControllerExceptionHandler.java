@@ -23,7 +23,7 @@ public class GlobalControllerExceptionHandler {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({CurrencyRateIsNotSupported.class})
-    private ResponseEntity<ErrorResponse> handleException(HttpServletRequest request, Exception e) {
+    private ResponseEntity<ErrorResponse> handleBadRequestException(HttpServletRequest request, Exception e) {
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
                 400,
@@ -31,6 +31,25 @@ public class GlobalControllerExceptionHandler {
                 request.getRequestURL().toString(),
                 e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // Статус - 400
+    }
+
+    /**
+     * "Ловец" исключений со статусом 500
+     *
+     * @param request информация о запросе
+     * @param e       выброшенное исключение
+     * @return json с информацией об ошибке
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler({ExchangeRateRestApiException.class})
+    private ResponseEntity<ErrorResponse> handleInternalServerException(HttpServletRequest request, Exception e) {
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                500,
+                "Internal Server Error",
+                request.getRequestURL().toString(),
+                e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR); // Статус - 500
     }
 }
 
