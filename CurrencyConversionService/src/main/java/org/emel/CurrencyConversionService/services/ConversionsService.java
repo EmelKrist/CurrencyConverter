@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -31,8 +33,7 @@ public class ConversionsService {
         String rate = sendHttpRequestToGetCurrencyRate(conversion.getFromCurrency(), conversion.getToCurrency());
         if (rate != null) { // если она существует
             // конвертируем данные
-            // TODO сделать округление результатов вычислений до 2 знаков после запятой
-            conversion.setCurrencyRate(Double.parseDouble(rate));
+            conversion.setCurrencyRate(Math.round(Double.parseDouble(rate) * 100.0) / 100.0);
             conversion.setTotalResult(calcConversionResult(conversion.getCurrencyRate(), conversion.getQuantity()));
             // TODO сделать форматирование даты и приветси к виду (дата часы:минуты)
             conversion.setConvertedAt(LocalDateTime.now());
