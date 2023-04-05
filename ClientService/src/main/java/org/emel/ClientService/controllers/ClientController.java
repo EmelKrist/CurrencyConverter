@@ -12,7 +12,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-
 import javax.validation.Valid;
 
 
@@ -71,20 +70,6 @@ public class ClientController {
         }
         return "redirect:/"; // если результата нет, то редирект на пустую форму
         //TODO сделать обработку ошибок с выводом сообщения от сервиса конвертации валют
-    }
-
-    /**
-     * GET-запрос для получения истории конвертаций
-     *
-     * @param model модель представления
-     * @return представление с историей конвертаций
-     */
-    @GetMapping("/history")
-    public String historyPage(Model model) {
-        // получаем список конвертаций из БД
-        model.addAttribute("conversions", clientService.getListOfConversions());
-        //TODO сделать обработку ошибок с выводом сообщения от сервиса конвертации валют
-        return "client/history";
     }
 
     /**

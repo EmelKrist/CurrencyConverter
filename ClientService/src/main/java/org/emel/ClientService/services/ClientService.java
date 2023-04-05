@@ -1,7 +1,6 @@
 package org.emel.ClientService.services;
 
 import org.emel.ClientService.dto.ConversionInputDataDTO;
-import org.emel.ClientService.dto.ConversionsResponse;
 import org.emel.ClientService.models.Conversion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Сервис для клиента
  */
 @Service
 public class ClientService {
-
     @Value("${microservice-currency-conversion.url}")
     private String url;
 
@@ -68,44 +63,5 @@ public class ClientService {
         final var request = new HttpEntity<>(conversionInputDataDTO, headers);
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate.postForEntity(url, request, Conversion.class);
-    }
-
-    /**
-     * Метод получения истории конвертаций
-     *
-     * @return список с конвертациями
-     */
-    public List<Conversion> getListOfConversions() {
-        log.debug("Gets a list of conversions");
-        try {
-            final var responseEntity = sendGetHttpRequestToGetListOfConversions();
-
-            if (responseEntity.getStatusCode().isError()) {
-                throw new RuntimeException(responseEntity.getStatusCode().getReasonPhrase());
-            }
-
-            if (responseEntity.hasBody()) {
-                log.debug("Successfully getting a list of conversions from the currency conversion service");
-                return responseEntity.getBody().getConversions();
-            }
-        } catch (Exception e) {
-            /* TODO добавить поле для хранения ошибки (в контроллере проверять на null),
-                в случае null Добавлять на представление метку с сообщением об ошибке */
-            log.debug("Program error because of{}", e.getMessage());
-        }
-        return null; // в противном случае возвращаем пустой список
-    }
-
-    /**
-     * Метод для отправки GET HTTP запроса для получения списка конвертаций
-     * от сервиса конвертации валют
-     *
-     * @return ответ от сервиса конвертации валют
-     */
-    private ResponseEntity<ConversionsResponse> sendGetHttpRequestToGetListOfConversions() {
-        log.debug("Sends an HTTP GET request to the currency conversion service to get list of conversions");
-        // отправляем запрос сервису конвертации валют для получения истории конвертаций
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.getForEntity(url, ConversionsResponse.class);
     }
 }

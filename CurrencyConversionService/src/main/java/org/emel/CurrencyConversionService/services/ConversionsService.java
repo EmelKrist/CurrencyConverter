@@ -1,57 +1,23 @@
 package org.emel.CurrencyConversionService.services;
 
 import org.emel.CurrencyConversionService.models.Conversion;
-import org.emel.CurrencyConversionService.repositories.ConversionsRepository;
 import org.emel.CurrencyConversionService.util.CurrencyRateIsNotSupported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 /**
- * Сервис для сущности Conversion
+ * Сервис для модели Conversion
  */
 @Service
 public class ConversionsService {
-
     private final Logger log = LoggerFactory.getLogger(ConversionsService.class);
-    private final ConversionsRepository conversionsRepository;
     @Value("${exchange.rate.api.url}")
     private String url;
-
-    @Autowired
-    public ConversionsService(ConversionsRepository conversionsRepository) {
-        this.conversionsRepository = conversionsRepository;
-    }
-
-    /**
-     * Метод для получения списка всех конвертаций (отсортированный по времени конвертации)
-     *
-     * @return список конвертаций
-     */
-    @Transactional(readOnly = true)
-    public List<Conversion> findAll() {
-        log.debug("Gets all conversions from the database");
-        return conversionsRepository.findAllByOrderByConvertedAtDesc();
-    }
-
-    /**
-     * Метод для сохранения успешной конвертации в БД
-     *
-     * @param conversion конвертация
-     */
-    @Transactional
-    public void save(Conversion conversion) {
-        log.debug("Saves to database conversion : {}", conversion);
-        conversionsRepository.save(conversion);
-    }
 
     /**
      * Метод конвертации
@@ -100,5 +66,4 @@ public class ConversionsService {
         log.debug("Converts quantity {} using the received rate {}", rate, quantity);
         return rate * quantity;
     }
-
 }

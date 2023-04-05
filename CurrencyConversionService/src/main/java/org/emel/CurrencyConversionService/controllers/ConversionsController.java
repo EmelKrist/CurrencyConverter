@@ -2,7 +2,6 @@ package org.emel.CurrencyConversionService.controllers;
 
 import org.emel.CurrencyConversionService.dto.ConversionDTO;
 import org.emel.CurrencyConversionService.dto.ConversionInputDataDTO;
-import org.emel.CurrencyConversionService.dto.ConversionsResponse;
 import org.emel.CurrencyConversionService.models.Conversion;
 import org.emel.CurrencyConversionService.services.ConversionsService;
 import org.emel.CurrencyConversionService.util.CurrencyRateIsNotSupported;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * REST контроллер для работы с конвертациями
@@ -34,21 +32,6 @@ public class ConversionsController {
     }
 
     /**
-     * GET-запрос на получение списка всех конвертаций (DTO)
-     *
-     * @return ответ со списком конвертаций в JSON формате
-     */
-    @GetMapping()
-    public ResponseEntity<ConversionsResponse> getAll() {
-        log.debug("Gets REST request to receive all data");
-        return ResponseEntity.ok(
-                new ConversionsResponse(
-                        conversionsService.findAll()
-                                .stream().map(this::convertToConversionDTO)
-                                .collect(Collectors.toList())));
-    }
-
-    /**
      * POST-запрос на конвертацию
      *
      * @param conversionInputDataDTO данные конвертации от клиента
@@ -61,7 +44,6 @@ public class ConversionsController {
         Optional<Conversion> conversion = conversionsService.convert(convertToConversion(conversionInputDataDTO));
         // если конвертация получена(существует), сохраняем в БД и возвращаем результат клиенту
         if (conversion.isPresent()) {
-            conversionsService.save(conversion.get());
             return ResponseEntity.ok().body(convertToConversionDTO(conversion.get()));
         } else { // в противном случае указываем, что заданная конвертация невозможна
             log.debug("Failed to get data from Coingate REST API");
@@ -88,5 +70,4 @@ public class ConversionsController {
     private ConversionDTO convertToConversionDTO(Conversion conversion) {
         return modelMapper.map(conversion, ConversionDTO.class);
     }
-
 }
