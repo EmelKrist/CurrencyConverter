@@ -13,7 +13,7 @@ public class Conversion {
     @Min(value = 1, message = "Сумма конвертации должна быть больше 0!")
     private int quantity = 1;
     private double totalResult;
-    private LocalDateTime convertedAt = null;
+    private String convertedAt = null;
 
     public Conversion(){
 
@@ -59,11 +59,11 @@ public class Conversion {
         this.totalResult = totalResult;
     }
 
-    public LocalDateTime getConvertedAt() {
+    public String getConvertedAt() {
         return convertedAt;
     }
 
-    public void setConvertedAt(LocalDateTime convertedAt) {
+    public void setConvertedAt(String convertedAt) {
         this.convertedAt = convertedAt;
     }
 }

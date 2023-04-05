@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 /**
@@ -35,8 +36,7 @@ public class ConversionsService {
             // конвертируем данные
             conversion.setCurrencyRate(Math.round(Double.parseDouble(rate) * 100.0) / 100.0);
             conversion.setTotalResult(calcConversionResult(conversion.getCurrencyRate(), conversion.getQuantity()));
-            // TODO сделать форматирование даты и приветси к виду (дата часы:минуты)
-            conversion.setConvertedAt(LocalDateTime.now());
+            conversion.setConvertedAt(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"))));
             return Optional.of(conversion); // конвертация с результатами
         }
         // иначе конвертация невозможна

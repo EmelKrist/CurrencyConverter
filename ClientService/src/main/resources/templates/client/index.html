@@ -23,7 +23,7 @@
         <!-- список доступных валют из БД -->
         <option th:each="currency : ${currencies}"
                 th:value="${currency.getCode()}"
-                th:text="${currency.getName() + '(' + currency.getCode() + ')'}">SelectedToCurrency
+                th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedToCurrency
         </option>
     </select>
     <br/>
@@ -39,7 +39,7 @@
  то выводим результат, иначе пустая строка -->
 <span th:text="${conversion.getConvertedAt() != null} ?
  ${conversion.getQuantity() + ' ' + conversion.getFromCurrency() + ' = '
- + conversion.getTotalResult() + ' ' + conversion.getToCurrency()} : ''">
+ + conversion.getTotalResult() + ' ' + conversion.getToCurrency() + ' ' + conversion.getConvertedAt()} : ''">
    someValue
 </span>
 <!-- GET-запрос на получение формы с историей конвертаций -->

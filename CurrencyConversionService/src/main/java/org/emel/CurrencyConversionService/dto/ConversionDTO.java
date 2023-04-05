@@ -11,7 +11,7 @@ public class ConversionDTO {
     private double currencyRate;
     private int quantity;
     private double totalResult;
-    private LocalDateTime convertedAt;
+    private String convertedAt;
 
     public ConversionDTO(){
 
@@ -57,11 +57,11 @@ public class ConversionDTO {
         this.totalResult = totalResult;
     }
 
-    public LocalDateTime getConvertedAt() {
+    public String getConvertedAt() {
         return convertedAt;
     }
 
-    public void setConvertedAt(LocalDateTime convertedAt) {
+    public void setConvertedAt(String convertedAt) {
         this.convertedAt = convertedAt;
     }
 }
