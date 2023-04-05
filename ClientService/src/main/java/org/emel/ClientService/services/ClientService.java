@@ -1,5 +1,8 @@
 package org.emel.ClientService.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.emel.ClientService.dto.ConversionInputDataDTO;
 import org.emel.ClientService.models.Conversion;
 import org.slf4j.Logger;
@@ -10,6 +13,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -19,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
 public class ClientService {
     @Value("${microservice-currency-conversion.url}")
     private String url;
-
+    private String serverError;
     private final Logger log = LoggerFactory.getLogger(ClientService.class);
 
     /**
@@ -34,17 +40,25 @@ public class ClientService {
             final var responseEntity = sendPostHttpRequestForConversion(conversionInputDataDTO);
             // если в сущности обнаружена ошибка, то выбрасываем исключение
             if (responseEntity.getStatusCode().isError()) {
-                throw new RuntimeException(responseEntity.getStatusCode().getReasonPhrase());
+                throw new RuntimeException(String.valueOf(responseEntity.getBody()));
             }
             // если у сущности есть тело (json)
             if (responseEntity.hasBody()) {
                 log.debug("Successful conversion response from the currency conversion service");
                 return responseEntity.getBody();
             }
-        } catch (Exception e) {
-            /* TODO добавить поле для хранения ошибки (в контроллере проверять на null),
-                в случае null Добавлять на представление метку с сообщением об ошибке */
+        } catch (HttpServerErrorException e) {
             log.debug("Program error because of{}", e.getMessage());
+            serverError = "Сервис конвертации валют недоступен!";
+        } catch (Exception e) {
+            String message = e.getMessage();
+            log.debug("Program error because of{}", message);
+            try {
+                JsonNode obj = new ObjectMapper().readTree(message.substring(7, message.length() - 1));
+                serverError = obj.get("message").asText();
+            } catch (JsonProcessingException | NullPointerException ex) {
+                serverError = "Сервис конвертации валют недоступен!";
+            }
         }
         return null;
     }
@@ -63,5 +77,13 @@ public class ClientService {
         final var request = new HttpEntity<>(conversionInputDataDTO, headers);
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate.postForEntity(url, request, Conversion.class);
+    }
+
+    public String getServerError() {
+        return serverError;
+    }
+
+    public void setServerError(String serverError) {
+        this.serverError = serverError;
     }
 }

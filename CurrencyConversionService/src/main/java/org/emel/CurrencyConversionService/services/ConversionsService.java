@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
@@ -29,7 +30,7 @@ public class ConversionsService {
      * @return объект конвертации с результатами конвертации (если они существуют)
      * @throws CurrencyRateIsNotSupported валютная ставка не поддерживается
      */
-    public Optional<Conversion> convert(Conversion conversion) throws CurrencyRateIsNotSupported {
+    public Conversion convert(Conversion conversion) throws CurrencyRateIsNotSupported {
         // получаем валютную ставку
         String rate = sendHttpRequestToGetCurrencyRate(conversion.getFromCurrency(), conversion.getToCurrency());
         if (rate != null) { // если она существует
@@ -37,10 +38,11 @@ public class ConversionsService {
             conversion.setCurrencyRate(Math.round(Double.parseDouble(rate) * 100.0) / 100.0);
             conversion.setTotalResult(calcConversionResult(conversion.getCurrencyRate(), conversion.getQuantity()));
             conversion.setConvertedAt(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"))));
-            return Optional.of(conversion); // конвертация с результатами
+            return conversion; // конвертация с результатами
+        } else {
+            log.debug("Failed to get data from Coingate REST API");
+            throw new CurrencyRateIsNotSupported("Выбранная валютная ставка не поддерживается!");
         }
-        // иначе конвертация невозможна
-        return Optional.empty();
     }
 
     /**
@@ -54,7 +56,7 @@ public class ConversionsService {
         try {
             log.debug("Sends a GET HTTP request to get exchange rate from {} to {} from Coingate REST API", from, to);
             return new RestTemplate().getForObject(String.format("%s/%s/%s", this.url, from, to), String.class);
-        } catch (HttpServerErrorException e){
+        } catch (HttpServerErrorException | HttpClientErrorException e){
             throw new ExchangeRateRestApiException("Сервис получения валютной ставки недоступен!");
         }
     }

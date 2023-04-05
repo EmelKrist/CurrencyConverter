@@ -31,6 +31,9 @@
     <label for="quantity">Сумма:</label>
     <input type="number" th:field="*{quantity}" id="quantity" required value="1">
     <div style="color:red" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">quantity Error</div>
+    <div th:if="${serverError}">
+        <span style="color:red" th:text="${serverError}">server error</span>
+    </div>
     <br/>
     <!-- Кнопка подтверждения отправки формы -->
     <input type="submit" value="Конвертировать">

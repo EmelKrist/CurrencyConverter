@@ -63,13 +63,13 @@ public class ClientController {
         // конвертируем данные, полученных из формы в объекте конвертации
         Conversion conversionResult = clientService.getConvert(convertToConversionInputDataDTO(conversion));
         if (conversionResult != null) { // если результат конвертации существует
-            // добавляем в модель представления список доступных валют и объект конвертации(с результатом)
+            // добавляем в модель представления объект конвертации(с результатом)
             model.addAttribute("conversion", conversionResult);
-            model.addAttribute("currencies", currenciesService.findAll());
-            return "client/index";
+        } else {
+            model.addAttribute("serverError", clientService.getServerError());
         }
-        return "redirect:/"; // если результата нет, то редирект на пустую форму
-        //TODO сделать обработку ошибок с выводом сообщения от сервиса конвертации валют
+        model.addAttribute("currencies", currenciesService.findAll());
+        return "client/index"; // возвращаем представление
     }
 
     /**

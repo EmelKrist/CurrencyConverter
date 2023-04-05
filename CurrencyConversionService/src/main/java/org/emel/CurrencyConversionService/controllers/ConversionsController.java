@@ -41,14 +41,8 @@ public class ConversionsController {
     public ResponseEntity<ConversionDTO> convert(@RequestBody ConversionInputDataDTO conversionInputDataDTO) {
         log.debug("Gets REST request to convert data : {}", conversionInputDataDTO);
         // конвертируем входные данные
-        Optional<Conversion> conversion = conversionsService.convert(convertToConversion(conversionInputDataDTO));
-        // если конвертация получена(существует), сохраняем в БД и возвращаем результат клиенту
-        if (conversion.isPresent()) {
-            return ResponseEntity.ok().body(convertToConversionDTO(conversion.get()));
-        } else { // в противном случае указываем, что заданная конвертация невозможна
-            log.debug("Failed to get data from Coingate REST API");
-            throw new CurrencyRateIsNotSupported("Выбранная валютная ставка не поддерживается!");
-        }
+        Conversion conversion = conversionsService.convert(convertToConversion(conversionInputDataDTO));
+        return ResponseEntity.ok().body(convertToConversionDTO(conversion));
     }
 
     /**
