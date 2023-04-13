@@ -6,7 +6,7 @@ package org.emel.ClientService.dto;
 public class ConversionInputDataDTO {
     private String fromCurrency;
     private String toCurrency;
-    private int quantity;
+    private long quantity;
     public ConversionInputDataDTO() {
 
     }
@@ -23,10 +23,12 @@ public class ConversionInputDataDTO {
     public void setToCurrency(String toCurrency) {
         this.toCurrency = toCurrency;
     }
-    public int getQuantity() {
+
+    public long getQuantity() {
         return quantity;
     }
-    public void setQuantity(int quantity) {
+
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 }

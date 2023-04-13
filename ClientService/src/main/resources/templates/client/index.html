@@ -24,7 +24,7 @@
 
             <div class="row"> <!-- Всплывающее меню выбора валюты, ИЗ которой конвертируется сумма -->
                 <label for="fromCurrency">Начальная валюта: </label>
-                <select class="form-group wide select-css" th:field="*{fromCurrency}" id="fromCurrency" onfocus='this.size=5;' onblur='this.size=1;' onchange='this.size=1; this.blur();'>
+                <select class="form-group wide select-css" th:field="*{fromCurrency}" id="fromCurrency">
                     <!-- список доступных валют из БД -->
                     <option th:each="currency : ${currencies}" th:value="${currency.getCode()}"
                             th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedFromCurrency
@@ -34,7 +34,7 @@
 
             <div class="row"> <!-- Всплывающее меню выбора валюты, В которую конвертируется сумма -->
                 <label for="toCurrency">Конечная валюта: </label>
-                <select class="form-group wide select-css" th:field="*{toCurrency}" id="toCurrency" onfocus='this.size=5;' onblur='this.size=1;' onchange='this.size=1; this.blur();'>
+                <select class="form-group wide select-css" th:field="*{toCurrency}" id="toCurrency">
                     <!-- список доступных валют из БД -->
                     <option th:each="currency : ${currencies}" th:value="${currency.getCode()}"
                             th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedToCurrency
@@ -45,7 +45,7 @@
         </div>
 
         <div class="field"> <!-- Поле для ввода конвертируемой суммы -->
-            <input type="text" class="input-number" maxlength="9"
+            <input type="text" class="input-number" maxlength="18"
                    th:field="*{quantity}" id="quantity"
                    required oninvalid="this.setCustomValidity('Сумма не должна быть пустой!')"
                    onchange="this.setCustomValidity('')" placeholder="Введите сумму...">

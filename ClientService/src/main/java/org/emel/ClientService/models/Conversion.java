@@ -1,8 +1,7 @@
 package org.emel.ClientService.models;
 
 import javax.validation.constraints.*;
-import java.math.BigInteger;
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 /**
  * Класс модели Conversion
@@ -11,14 +10,16 @@ public class Conversion {
     private String fromCurrency;
     private String toCurrency;
     private double currencyRate;
-    @Min(value = 1, message = "Сумма конвертации должна быть от 1 до 999.999.999!")
-    private int quantity = 1;
-    private double totalResult;
+    @Min(value = 1, message = "Сумма конвертации должна быть больше 0!")
+    private long quantity = 1;
+    private BigDecimal totalResult;
     private String convertedAt = null;
 
     public Conversion(){
 
     }
+
+
 
     public String getFromCurrency() {
         return fromCurrency;
@@ -44,19 +45,19 @@ public class Conversion {
         this.currencyRate = currencyRate;
     }
 
-    public int getQuantity() {
+    public long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 
-    public double getTotalResult() {
+    public BigDecimal getTotalResult() {
         return totalResult;
     }
 
-    public void setTotalResult(double totalResult) {
+    public void setTotalResult(BigDecimal totalResult) {
         this.totalResult = totalResult;
     }
 

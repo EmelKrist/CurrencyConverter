@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.UnknownHttpStatusCodeException;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 /**
  * Сервис для модели Conversion
@@ -35,10 +38,15 @@ public class ConversionsService {
         String rate = sendHttpRequestToGetCurrencyRate(conversion.getFromCurrency(), conversion.getToCurrency());
         if (rate != null) { // если она существует
             // конвертируем данные
-            conversion.setCurrencyRate(Math.round(Double.parseDouble(rate) * 100.0) / 100.0);
-            conversion.setTotalResult(calcConversionResult(conversion.getCurrencyRate(), conversion.getQuantity()));
-            conversion.setConvertedAt(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"))));
-            return conversion; // конвертация с результатами
+            try {
+                conversion.setCurrencyRate(Double.parseDouble(rate));
+                conversion.setTotalResult(calcConversionResult(conversion.getCurrencyRate(), conversion.getQuantity()));
+                conversion.setConvertedAt(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"))));
+                return conversion; // конвертация с результатами
+            } catch (NumberFormatException e) {
+                log.debug("Failed to parse the exchange rate");
+                throw new CurrencyRateIsNotSupported("Неподдерживаемый формат валютной ставки!");
+            }
         } else {
             log.debug("Failed to get data from Coingate REST API");
             throw new CurrencyRateIsNotSupported("Выбранная валютная ставка не поддерживается!");
@@ -56,7 +64,7 @@ public class ConversionsService {
         try {
             log.debug("Sends a GET HTTP request to get exchange rate from {} to {} from Coingate REST API", from, to);
             return new RestTemplate().getForObject(String.format("%s/%s/%s", this.url, from, to), String.class);
-        } catch (HttpServerErrorException | HttpClientErrorException e){
+        } catch (HttpServerErrorException | HttpClientErrorException | UnknownHttpStatusCodeException e) {
             throw new ExchangeRateRestApiException("Сервис получения валютной ставки недоступен!");
         }
     }
@@ -68,8 +76,12 @@ public class ConversionsService {
      * @param quantity сумма
      * @return эквивалент суммы в другой валюте
      */
-    private double calcConversionResult(double rate, int quantity) {
+    private BigDecimal calcConversionResult(double rate, long quantity) {
         log.debug("Converts quantity {} using the received rate {}", rate, quantity);
-        return rate * quantity;
+        BigDecimal result = new BigDecimal(rate).multiply(new BigDecimal(quantity));
+        int scale = 2;
+        if (result.compareTo(new BigDecimal(1)) <= 0) scale = 6;
+
+        return result.setScale(scale, RoundingMode.FLOOR);
     }
 }

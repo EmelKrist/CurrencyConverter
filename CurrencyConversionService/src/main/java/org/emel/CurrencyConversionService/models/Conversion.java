@@ -1,6 +1,7 @@
 package org.emel.CurrencyConversionService.models;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -11,14 +12,14 @@ public class Conversion {
     private String fromCurrency;
     private String toCurrency;
     private double currencyRate;
-    private int quantity;
-    private double totalResult;
+    private long quantity;
+    private BigDecimal totalResult;
     private String convertedAt;
 
     public Conversion() {
     }
 
-    public Conversion(String fromCurrency, String toCurrency, double currencyRate, int quantity) {
+    public Conversion(String fromCurrency, String toCurrency, double currencyRate, long quantity) {
         this.fromCurrency = fromCurrency;
         this.toCurrency = toCurrency;
         this.currencyRate = currencyRate;
@@ -42,19 +43,20 @@ public class Conversion {
     public void setCurrencyRate(double currencyRate) {
         this.currencyRate = currencyRate;
     }
-    public int getQuantity() {
+
+    public long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 
-    public double getTotalResult() {
+    public BigDecimal getTotalResult() {
         return totalResult;
     }
 
-    public void setTotalResult(double totalResult) {
+    public void setTotalResult(BigDecimal totalResult) {
         this.totalResult = totalResult;
     }
 

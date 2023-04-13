@@ -9,7 +9,7 @@ public class ConversionInputDataDTO {
 
     private String toCurrency;
 
-    private int quantity;
+    private long quantity;
 
     public ConversionInputDataDTO() {
 
@@ -31,11 +31,11 @@ public class ConversionInputDataDTO {
         this.toCurrency = toCurrency;
     }
 
-    public int getQuantity() {
+    public long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 }

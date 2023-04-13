@@ -1,5 +1,6 @@
 package org.emel.CurrencyConversionService.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -9,8 +10,8 @@ public class ConversionDTO {
     private String fromCurrency;
     private String toCurrency;
     private double currencyRate;
-    private int quantity;
-    private double totalResult;
+    private long quantity;
+    private BigDecimal totalResult;
     private String convertedAt;
 
     public ConversionDTO(){
@@ -41,19 +42,19 @@ public class ConversionDTO {
         this.currencyRate = currencyRate;
     }
 
-    public int getQuantity() {
+    public long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 
-    public double getTotalResult() {
+    public BigDecimal getTotalResult() {
         return totalResult;
     }
 
-    public void setTotalResult(double totalResult) {
+    public void setTotalResult(BigDecimal totalResult) {
         this.totalResult = totalResult;
     }
 
