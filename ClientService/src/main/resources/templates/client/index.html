@@ -1,49 +1,94 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Currency converter</title>
+    <link th:href="@{css/main.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{css/nice-select.css}">
 </head>
+
 <body>
-<!-- POST-запрос для инициализации и запуска конвертации -->
-<form th:method="POST" th:action="@{/}" th:object="${conversion}">
-    <!-- Всплывающее меню выбора валюты, ИЗ которой конвертируется сумма -->
-    <label for="fromCurrency">Из</label>
-    <select th:field="*{fromCurrency}" id="fromCurrency">
-        <!-- список доступных валют из БД -->
-        <option th:each="currency : ${currencies}"
-                th:value="${currency.getCode()}"
-                th:text="${currency.getName() + '(' + currency.getCode() + ')'}">SelectedFromCurrency
-        </option>
-    </select>
-    <br/>
-    <!-- Всплывающее меню выбора валюты, В которую конвертируется сумма -->
-    <label for="toCurrency">В</label>
-    <select th:field="*{toCurrency}" id="toCurrency">
-        <!-- список доступных валют из БД -->
-        <option th:each="currency : ${currencies}"
-                th:value="${currency.getCode()}"
-                th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedToCurrency
-        </option>
-    </select>
-    <br/>
-    <!-- Поле для ввода конвертируемой суммы -->
-    <label for="quantity">Сумма:</label>
-    <input type="number" th:field="*{quantity}" id="quantity" required value="1">
-    <div style="color:red" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">quantity Error</div>
-    <div th:if="${serverError}">
-        <span style="color:red" th:text="${serverError}">server error</span>
+
+<div class="position">
+    <div class="box">
+        <span>Currency Converter</span>
     </div>
-    <br/>
-    <!-- Кнопка подтверждения отправки формы -->
-    <input type="submit" value="Конвертировать">
-</form>
-<!-- Текст: если в модели в атрибуте конвертации есть дата конвертации,
- то выводим результат, иначе пустая строка -->
-<span th:text="${conversion.getConvertedAt() != null} ?
- ${conversion.getQuantity() + ' ' + conversion.getFromCurrency() + ' = '
- + conversion.getTotalResult() + ' ' + conversion.getToCurrency() + ' ' + conversion.getConvertedAt()} : ''">
-   someValue
-</span>
+</div>
+
+<div class="container box-model">
+    <!-- POST-запрос для инициализации и запуска конвертации -->
+    <form th:method="POST" th:action="@{/}" th:object="${conversion}">
+
+        <div class="col">
+
+            <div class="row"> <!-- Всплывающее меню выбора валюты, ИЗ которой конвертируется сумма -->
+                <label for="fromCurrency">Начальная валюта: </label>
+                <select class="form-group wide select-css" th:field="*{fromCurrency}" id="fromCurrency" onfocus='this.size=5;' onblur='this.size=1;' onchange='this.size=1; this.blur();'>
+                    <!-- список доступных валют из БД -->
+                    <option th:each="currency : ${currencies}" th:value="${currency.getCode()}"
+                            th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedFromCurrency
+                    </option>
+                </select>
+            </div>
+
+            <div class="row"> <!-- Всплывающее меню выбора валюты, В которую конвертируется сумма -->
+                <label for="toCurrency">Конечная валюта: </label>
+                <select class="form-group wide select-css" th:field="*{toCurrency}" id="toCurrency" onfocus='this.size=5;' onblur='this.size=1;' onchange='this.size=1; this.blur();'>
+                    <!-- список доступных валют из БД -->
+                    <option th:each="currency : ${currencies}" th:value="${currency.getCode()}"
+                            th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedToCurrency
+                    </option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="field"> <!-- Поле для ввода конвертируемой суммы -->
+            <input type="text" class="input-number" maxlength="9"
+                   th:field="*{quantity}" id="quantity"
+                   required oninvalid="this.setCustomValidity('Сумма не должна быть пустой!')"
+                   onchange="this.setCustomValidity('')" placeholder="Введите сумму...">
+        </div>
+
+        <!-- Кнопка подтверждения отправки формы -->
+        <input class="btn" type="submit" value="Выполнить"/>
+        <!-- Текст: если в модели в атрибуте конвертации есть дата конвертации,
+            то выводим результат (таблицей) -->
+        <div class="message" th:if="${conversion.getConvertedAt() != null}">
+            <table class="table">
+                <tr>
+                    <td><span th:text="${conversion.getQuantity() + ' ' + conversion.getFromCurrency() + ' = '
+							+ conversion.getTotalResult() + ' ' + conversion.getToCurrency()}">ConversionResult</span>
+                    </td>
+                    <td><span th:text="${conversion.getConvertedAt()}">ConversionTime</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="error">
+            <span style="color:red" th:if="${#fields.hasErrors('quantity')}"
+                  th:errors="*{quantity}">quantityError</span>
+        </div>
+
+        <div class="error" th:if="${serverError}">
+            <span style="color:red" th:text="${serverError}">serverError</span>
+        </div>
+
+    </form>
+
+</div>
+
+<script th:src="@{https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/customInput.js}"></script>
+
+<script type="text/javascript" th:src="@{/js/jquery.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.nice-select.js}"></script>
+<script>
+    $(document).ready(function() {
+        $('select').niceSelect();
+    });
+</script>
+
 </body>
 </html>

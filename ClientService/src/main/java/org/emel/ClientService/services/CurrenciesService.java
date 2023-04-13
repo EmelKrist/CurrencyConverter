@@ -3,6 +3,7 @@ package org.emel.ClientService.services;
 import org.emel.ClientService.models.Currency;
 import org.emel.ClientService.repositories.CurrenciesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,6 @@ public class CurrenciesService {
      */
     @Transactional(readOnly = true)
     public List<Currency> findAll() {
-        return currenciesRepository.findAll();
+        return currenciesRepository.findAll(Sort.by("name"));
     }
 }
