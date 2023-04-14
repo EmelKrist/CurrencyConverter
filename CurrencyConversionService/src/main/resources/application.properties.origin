@@ -1,0 +1,5 @@
+# REST API for exchange rates
+exchange.rate.api.url=https://api.coingate.com/api/v2/rates/merchant
+
+# server configuration
+server.port=

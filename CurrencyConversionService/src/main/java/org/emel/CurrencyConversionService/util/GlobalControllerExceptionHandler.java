@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Глобальный класс для "отлова" всех исключений в REST контролерах
+ * Глобальный класс для обработки всех исключений в REST контролерах
  */
 @RestControllerAdvice
 public class GlobalControllerExceptionHandler {
 
     /**
-     * "Ловец" исключений со статусом 400
+     * Обработчик исключений со статусом 400
      *
      * @param request информация о запросе
      * @param e       выброшенное исключение
@@ -34,7 +34,7 @@ public class GlobalControllerExceptionHandler {
     }
 
     /**
-     * "Ловец" исключений со статусом 500
+     * Обработчик исключений со статусом 500
      *
      * @param request информация о запросе
      * @param e       выброшенное исключение

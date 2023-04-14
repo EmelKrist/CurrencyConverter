@@ -11,7 +11,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.UnknownHttpStatusCodeException;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -78,10 +77,12 @@ public class ConversionsService {
      */
     private BigDecimal calcConversionResult(double rate, long quantity) {
         log.debug("Converts quantity {} using the received rate {}", rate, quantity);
+        // умножаем сумму на валютную ставку
         BigDecimal result = new BigDecimal(rate).multiply(new BigDecimal(quantity));
+        // если результат очень маленький, то кол-во знаков после запятой - 6, иначе - 2
         int scale = 2;
         if (result.compareTo(new BigDecimal(1)) <= 0) scale = 6;
-
+        // округляем
         return result.setScale(scale, RoundingMode.FLOOR);
     }
 }

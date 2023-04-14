@@ -25,8 +25,11 @@ import javax.validation.Valid;
  */
 @Controller
 public class ClientController {
+
     private final ClientService clientService;
+
     private final CurrenciesService currenciesService;
+
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -55,7 +58,7 @@ public class ClientController {
      *
      * @param conversion исходные данные конвертации из формы
      * @param model      модель представления
-     * @return на форму с результатом конвертации
+     * @return форма с результатом конвертации
      */
     @PostMapping()
     public String convert(@ModelAttribute("conversion") @Valid Conversion conversion,
@@ -70,7 +73,7 @@ public class ClientController {
         if (conversionResult != null) { // если результат конвертации существует
             // добавляем в модель представления объект конвертации(с результатом)
             model.addAttribute("conversion", conversionResult);
-        } else {
+        } else { // иначе ошибка сервера
             model.addAttribute("serverError", clientService.getServerError());
         }
         model.addAttribute("currencies", currenciesService.findAll());
@@ -86,7 +89,7 @@ public class ClientController {
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-
+        // получаем статус ошибки и возвращаем представление, в зависимости от кода
         if (status != null) {
             Integer statusCode = Integer.valueOf(status.toString());
 

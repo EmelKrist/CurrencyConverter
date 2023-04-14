@@ -23,6 +23,7 @@ public class Currency {
     }
 
     public Currency() {
+
     }
 
     public int getId() {

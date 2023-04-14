@@ -19,8 +19,6 @@ public class Conversion {
 
     }
 
-
-
     public String getFromCurrency() {
         return fromCurrency;
     }

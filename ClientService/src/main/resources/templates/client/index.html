@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Currency converter</title>
-    <link th:href="@{css/main.css}" rel="stylesheet">
+    <link th:href="@{css/main.css}" rel="stylesheet"> <!-- css стили -->
     <link rel="stylesheet" th:href="@{css/nice-select.css}">
 </head>
 
 <body>
 
-<div class="position">
+<div class="position"> <!-- header -->
     <div class="box">
         <span>Currency Converter</span>
     </div>
@@ -24,7 +24,7 @@
 
             <div class="row"> <!-- Всплывающее меню выбора валюты, ИЗ которой конвертируется сумма -->
                 <label for="fromCurrency">Начальная валюта: </label>
-                <select class="form-group wide select-css" th:field="*{fromCurrency}" id="fromCurrency">
+                <select class="wide select-css" th:field="*{fromCurrency}" id="fromCurrency">
                     <!-- список доступных валют из БД -->
                     <option th:each="currency : ${currencies}" th:value="${currency.getCode()}"
                             th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedFromCurrency
@@ -34,7 +34,7 @@
 
             <div class="row"> <!-- Всплывающее меню выбора валюты, В которую конвертируется сумма -->
                 <label for="toCurrency">Конечная валюта: </label>
-                <select class="form-group wide select-css" th:field="*{toCurrency}" id="toCurrency">
+                <select class="wide select-css" th:field="*{toCurrency}" id="toCurrency">
                     <!-- список доступных валют из БД -->
                     <option th:each="currency : ${currencies}" th:value="${currency.getCode()}"
                             th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedToCurrency
@@ -66,12 +66,12 @@
             </table>
         </div>
 
-        <div class="error">
+        <div class="error"> <!-- ошибка ввода суммы -->
             <span style="color:red" th:if="${#fields.hasErrors('quantity')}"
                   th:errors="*{quantity}">quantityError</span>
         </div>
 
-        <div class="error" th:if="${serverError}">
+        <div class="error" th:if="${serverError}"> <!-- ошибка сервера -->
             <span style="color:red" th:text="${serverError}">serverError</span>
         </div>
 
@@ -79,16 +79,16 @@
 
 </div>
 
+<!-- скрипты для кастомного поля ввода (строковое поле для ввода только цифр)  -->
+<!-- кастомное поле нужно, потому что числовое поле не имеет ограничений по
+количеству введенных символов (maxlength) -->
 <script th:src="@{https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/customInput.js}"></script>
 
+<!-- скрипты для кастомного выезжающего меню выбора select -->
 <script type="text/javascript" th:src="@{/js/jquery.js}"></script>
 <script type="text/javascript" th:src="@{/js/jquery.nice-select.js}"></script>
-<script>
-    $(document).ready(function() {
-        $('select').niceSelect();
-    });
-</script>
+<script type="text/javascript" th:src="@{/js/customSelect.js}"></script>
 
 </body>
 </html>

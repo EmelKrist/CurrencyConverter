@@ -42,17 +42,17 @@ public class ClientService {
             if (responseEntity.getStatusCode().isError()) {
                 throw new RuntimeException(String.valueOf(responseEntity.getBody()));
             }
-            // если у сущности есть тело (json)
+            // если у сущности есть данные в теле
             if (responseEntity.hasBody()) {
                 log.debug("Successful conversion response from the currency conversion service");
                 return responseEntity.getBody();
             }
         } catch (HttpServerErrorException e) {
-            log.debug("Program error because of{}", e.getMessage());
+            log.debug("Program error because of {}", e.getMessage());
             serverError = "Сервис конвертации валют недоступен!";
         } catch (Exception e) {
             String message = e.getMessage();
-            log.debug("Program error because of{}", message);
+            log.debug("Program error because of {}", message);
             try {
                 JsonNode obj = new ObjectMapper().readTree(message.substring(7, message.length() - 1));
                 serverError = obj.get("message").asText();
@@ -64,7 +64,7 @@ public class ClientService {
     }
 
     /**
-     * Метод отправки POST HTTP Запроса для конвертации на стороне сервиса конвертации валют
+     * Метод отправки POST HTTP запроса для конвертации на стороне сервиса конвертации валют
      *
      * @param conversionInputDataDTO входные данные для конвертации
      * @return ответ от сервиса конвертации валют

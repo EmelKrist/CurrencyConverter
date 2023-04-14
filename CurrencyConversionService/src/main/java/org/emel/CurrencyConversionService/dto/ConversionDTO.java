@@ -1,7 +1,6 @@
 package org.emel.CurrencyConversionService.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
  * Класс объекта передачи данных для модели Conversion
