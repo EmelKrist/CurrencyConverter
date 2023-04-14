@@ -1,48 +1,27 @@
 package org.emel.CurrencyConversionService.models;
 
-import javax.persistence.*;
-
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 /**
- * Класс модели (сущности) Conversion
+ * Класс модели Conversion
  */
-@Entity
-@Table(name = "Conversion")
 public class Conversion {
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column(name = "from_currency")
     private String fromCurrency;
-    @Column(name = "to_currency")
     private String toCurrency;
-    @Column(name = "currency_rate")
     private double currencyRate;
-    @Column(name = "quantity")
-    private int quantity;
-    @Column(name = "total_result")
-    private double totalResult;
-    @Column(name = "converted_at")
-    private LocalDateTime convertedAt;
+    private long quantity;
+    private BigDecimal totalResult;
+    private String convertedAt;
 
     public Conversion() {
+
     }
 
-    public Conversion(String fromCurrency, String toCurrency, double currencyRate, int quantity) {
+    public Conversion(String fromCurrency, String toCurrency, double currencyRate, long quantity) {
         this.fromCurrency = fromCurrency;
         this.toCurrency = toCurrency;
         this.currencyRate = currencyRate;
         this.quantity = quantity;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getFromCurrency() {
@@ -69,27 +48,27 @@ public class Conversion {
         this.currencyRate = currencyRate;
     }
 
-    public int getQuantity() {
+    public long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 
-    public double getTotalResult() {
+    public BigDecimal getTotalResult() {
         return totalResult;
     }
 
-    public void setTotalResult(double totalResult) {
+    public void setTotalResult(BigDecimal totalResult) {
         this.totalResult = totalResult;
     }
 
-    public LocalDateTime getConvertedAt() {
+    public String getConvertedAt() {
         return convertedAt;
     }
 
-    public void setConvertedAt(LocalDateTime convertedAt) {
+    public void setConvertedAt(String convertedAt) {
         this.convertedAt = convertedAt;
     }
 }

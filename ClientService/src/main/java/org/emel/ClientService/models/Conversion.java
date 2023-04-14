@@ -1,19 +1,21 @@
-package org.emel.CurrencyConversionService.dto;
+package org.emel.ClientService.models;
 
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
 /**
- * Класс объекта передачи данных для модели Conversion
+ * Класс модели Conversion
  */
-public class ConversionDTO {
+public class Conversion {
     private String fromCurrency;
     private String toCurrency;
     private double currencyRate;
-    private long quantity;
+    @Min(value = 1, message = "Сумма конвертации должна быть больше 0!")
+    private long quantity = 1;
     private BigDecimal totalResult;
-    private String convertedAt;
+    private String convertedAt = null;
 
-    public ConversionDTO(){
+    public Conversion(){
 
     }
 

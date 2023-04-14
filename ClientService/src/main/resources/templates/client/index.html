@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Currency converter</title>
+    <link th:href="@{css/main.css}" rel="stylesheet"> <!-- css стили -->
+    <link rel="stylesheet" th:href="@{css/nice-select.css}">
+</head>
+
+<body>
+
+<div class="position"> <!-- header -->
+    <div class="box">
+        <span>Currency Converter</span>
+    </div>
+</div>
+
+<div class="container box-model">
+    <!-- POST-запрос для инициализации и запуска конвертации -->
+    <form th:method="POST" th:action="@{/}" th:object="${conversion}">
+
+        <div class="col">
+
+            <div class="row"> <!-- Всплывающее меню выбора валюты, ИЗ которой конвертируется сумма -->
+                <label for="fromCurrency">Начальная валюта: </label>
+                <select class="wide select-css" th:field="*{fromCurrency}" id="fromCurrency">
+                    <!-- список доступных валют из БД -->
+                    <option th:each="currency : ${currencies}" th:value="${currency.getCode()}"
+                            th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedFromCurrency
+                    </option>
+                </select>
+            </div>
+
+            <div class="row"> <!-- Всплывающее меню выбора валюты, В которую конвертируется сумма -->
+                <label for="toCurrency">Конечная валюта: </label>
+                <select class="wide select-css" th:field="*{toCurrency}" id="toCurrency">
+                    <!-- список доступных валют из БД -->
+                    <option th:each="currency : ${currencies}" th:value="${currency.getCode()}"
+                            th:text="${currency.getName() + ' (' + currency.getCode() + ')'}">SelectedToCurrency
+                    </option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="field"> <!-- Поле для ввода конвертируемой суммы -->
+            <input type="text" class="input-number" maxlength="18"
+                   th:field="*{quantity}" id="quantity"
+                   required oninvalid="this.setCustomValidity('Сумма не должна быть пустой!')"
+                   onchange="this.setCustomValidity('')" placeholder="Введите сумму...">
+        </div>
+
+        <!-- Кнопка подтверждения отправки формы -->
+        <input class="btn" type="submit" value="Выполнить"/>
+        <!-- Текст: если в модели в атрибуте конвертации есть дата конвертации,
+            то выводим результат (таблицей) -->
+        <div class="message" th:if="${conversion.getConvertedAt() != null}">
+            <table class="table">
+                <tr>
+                    <td><span th:text="${conversion.getQuantity() + ' ' + conversion.getFromCurrency() + ' = '
+							+ conversion.getTotalResult() + ' ' + conversion.getToCurrency()}">ConversionResult</span>
+                    </td>
+                    <td><span th:text="${conversion.getConvertedAt()}">ConversionTime</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="error"> <!-- ошибка ввода суммы -->
+            <span style="color:red" th:if="${#fields.hasErrors('quantity')}"
+                  th:errors="*{quantity}">quantityError</span>
+        </div>
+
+        <div class="error" th:if="${serverError}"> <!-- ошибка сервера -->
+            <span style="color:red" th:text="${serverError}">serverError</span>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- скрипты для кастомного поля ввода (строковое поле для ввода только цифр)  -->
+<!-- кастомное поле нужно, потому что числовое поле не имеет ограничений по
+количеству введенных символов (maxlength) -->
+<script th:src="@{https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/customInput.js}"></script>
+
+<!-- скрипты для кастомного выезжающего меню выбора select -->
+<script type="text/javascript" th:src="@{/js/jquery.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.nice-select.js}"></script>
+<script type="text/javascript" th:src="@{/js/customSelect.js}"></script>
+
+</body>
+</html>
