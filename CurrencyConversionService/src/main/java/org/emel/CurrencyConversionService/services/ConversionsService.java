@@ -1,10 +1,14 @@
 package org.emel.CurrencyConversionService.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.emel.CurrencyConversionService.dto.ConversionInputDataDTO;
 import org.emel.CurrencyConversionService.models.Conversion;
-import org.emel.CurrencyConversionService.util.CurrencyRateIsNotSupported;
-import org.emel.CurrencyConversionService.util.ExchangeRateRestApiException;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -24,32 +28,61 @@ public class ConversionsService {
     private final Logger log = LoggerFactory.getLogger(ConversionsService.class);
     @Value("${exchange.rate.api.url}")
     private String url;
+    private final ModelMapper modelMapper;
+
+    @Autowired
+    public ConversionsService(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
+
+    /**
+     * Слушатель для RabbitMQ очереди ccQueue
+     * @param message сообщение, полученное из очереди
+     * @return json с результатом конвертации
+     * @throws JsonProcessingException ошибка обработки json
+     */
+    @RabbitListener(queues = "ccQueue")
+    public String process(String message) throws JsonProcessingException {
+
+        ConversionInputDataDTO conversionInputDataDTO = new ObjectMapper().readValue(message, ConversionInputDataDTO.class);
+        Conversion conversion = convert(convertToConversion(conversionInputDataDTO));
+        return new ObjectMapper().writeValueAsString(conversion);
+    }
+
+    /**
+     * Метод конвертации объекта ConversionInputDataDTO в объект модели Conversion
+     *
+     * @param conversionInputDataDTO объект передачи данных от клиента
+     * @return объект модели Conversion
+     */
+    private Conversion convertToConversion(ConversionInputDataDTO conversionInputDataDTO) {
+        return modelMapper.map(conversionInputDataDTO, Conversion.class);
+    }
 
     /**
      * Метод конвертации
      *
-     * @param conversion объект конвертации с исходными данными
      * @return объект конвертации с результатами конвертации (если они существуют)
-     * @throws CurrencyRateIsNotSupported валютная ставка не поддерживается
      */
-    public Conversion convert(Conversion conversion) throws CurrencyRateIsNotSupported {
-        // получаем валютную ставку
-        String rate = sendHttpRequestToGetCurrencyRate(conversion.getFromCurrency(), conversion.getToCurrency());
-        if (rate != null) { // если она существует
-            // конвертируем данные
-            try {
+    private Conversion convert(Conversion conversion) {
+        try { // получаем валютную ставку и, если она существует, конвертируем данные
+            String rate = sendHttpRequestToGetCurrencyRate(conversion.getFromCurrency(), conversion.getToCurrency());
+            if (rate != null) {
                 conversion.setCurrencyRate(Double.parseDouble(rate));
                 conversion.setTotalResult(calcConversionResult(conversion.getCurrencyRate(), conversion.getQuantity()));
-                conversion.setConvertedAt(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"))));
-                return conversion; // конвертация с результатами
-            } catch (NumberFormatException e) {
-                log.debug("Failed to parse the exchange rate");
-                throw new CurrencyRateIsNotSupported("Неподдерживаемый формат валютной ставки!");
+                conversion.setConvertedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy")));
+            } else {
+                log.debug("Failed to get data from Coingate REST API");
+                conversion.setError("Выбранная валютная ставка не поддерживается!");
             }
-        } else {
-            log.debug("Failed to get data from Coingate REST API");
-            throw new CurrencyRateIsNotSupported("Выбранная валютная ставка не поддерживается!");
+        } catch (NumberFormatException e) {
+            log.debug("Failed to parse the exchange rate");
+            conversion.setError("Неподдерживаемый формат валютной ставки!");
+        } catch (Exception e) {
+            log.debug("The service for receiving a currency rate is unavailable!");
+            conversion.setError("Сервис получения валютной ставки недоступен!");
         }
+        return conversion; // конвертация с результатами
     }
 
     /**
@@ -59,13 +92,12 @@ public class ConversionsService {
      * @param to   валюта, в которую конвертируют
      * @return строковая валютная ставка
      */
-    private String sendHttpRequestToGetCurrencyRate(String from, String to) {
-        try {
-            log.debug("Sends a GET HTTP request to get exchange rate from {} to {} from Coingate REST API", from, to);
-            return new RestTemplate().getForObject(String.format("%s/%s/%s", this.url, from, to), String.class);
-        } catch (HttpServerErrorException | HttpClientErrorException | UnknownHttpStatusCodeException e) {
-            throw new ExchangeRateRestApiException("Сервис получения валютной ставки недоступен!");
-        }
+    private String sendHttpRequestToGetCurrencyRate(String from, String to) throws
+            HttpServerErrorException,
+            HttpClientErrorException,
+            UnknownHttpStatusCodeException {
+        log.debug("Sends a GET HTTP request to get exchange rate from {} to {} from Coingate REST API", from, to);
+        return new RestTemplate().getForObject(String.format("%s/%s/%s", this.url, from, to), String.class);
     }
 
     /**

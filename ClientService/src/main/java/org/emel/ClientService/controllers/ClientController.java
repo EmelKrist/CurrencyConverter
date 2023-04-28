@@ -32,6 +32,7 @@ public class ClientController {
 
     private final ModelMapper modelMapper;
 
+
     @Autowired
     public ClientController(ClientService clientService, CurrenciesService currenciesService, ModelMapper modelMapper) {
         this.clientService = clientService;
@@ -63,20 +64,20 @@ public class ClientController {
     @PostMapping()
     public String convert(@ModelAttribute("conversion") @Valid Conversion conversion,
                           BindingResult bindingResult, Model model) {
+        model.addAttribute("currencies", currenciesService.findAll());
         if (bindingResult.hasErrors()) { // если есть ошибки валидации
-            model.addAttribute("currencies", currenciesService.findAll());
             return "client/index"; // возвращаем представление
         }
 
-        // конвертируем данные, полученных из формы в объекте конвертации
-        Conversion conversionResult = clientService.getConvert(convertToConversionInputDataDTO(conversion));
-        if (conversionResult != null) { // если результат конвертации существует
-            // добавляем в модель представления объект конвертации(с результатом)
-            model.addAttribute("conversion", conversionResult);
-        } else { // иначе ошибка сервера
-            model.addAttribute("serverError", clientService.getServerError());
+        // конвертируем данные, полученные из формы в объекте конвертации
+        Conversion conversionWithResult = clientService.getConvert(convertToConversionInputDataDTO(conversion));
+
+        if (conversionWithResult != null) { // если конвертация с результатом существует
+            // добавляем в модель представления объект конвертации с результатом
+            model.addAttribute("conversion", conversionWithResult);
+        } else { // иначе ошибка сервиса
+            model.addAttribute("serviceError", clientService.getServiceError());
         }
-        model.addAttribute("currencies", currenciesService.findAll());
         return "client/index"; // возвращаем представление
     }
 

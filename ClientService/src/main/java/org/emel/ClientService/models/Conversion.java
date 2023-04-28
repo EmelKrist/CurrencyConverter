@@ -14,6 +14,7 @@ public class Conversion {
     private long quantity = 1;
     private BigDecimal totalResult;
     private String convertedAt = null;
+    private String error = null;
 
     public Conversion(){
 
@@ -65,5 +66,13 @@ public class Conversion {
 
     public void setConvertedAt(String convertedAt) {
         this.convertedAt = convertedAt;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

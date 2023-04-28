@@ -11,5 +11,12 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 server.port=
 server.error.path=/error
 
-# Currency conversion service configuration
-microservice-currency-conversion.url=
+# RabbitMQ configuration
+spring.rabbitmq.host=
+spring.rabbitmq.port=
+spring.rabbitmq.username=
+spring.rabbitmq.password=
+spring.rabbitmq.virtual-host=
+spring.rabbitmq.queue-name=
+spring.rabbitmq.exchange-name=
+spring.rabbitmq.routing-key-name=
