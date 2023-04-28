@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Репозиторий для сущности Currency (строковый id)
+ * Репозиторий для сущности Currency (числовой id)
  */
 @Repository
 public interface CurrenciesRepository extends JpaRepository<Currency, Integer> {

@@ -71,8 +71,8 @@
                   th:errors="*{quantity}">quantityError</span>
         </div>
 
-        <div class="error" th:if="${serverError}"> <!-- ошибка сервера -->
-            <span style="color:red" th:text="${serverError}">serverError</span>
+        <div class="error" th:if="${serviceError}"> <!-- ошибка сервиса -->
+            <span style="color:red" th:text="${serviceError}">serverError</span>
         </div>
 
     </form>
@@ -85,7 +85,7 @@
 <script th:src="@{https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/customInput.js}"></script>
 
-<!-- скрипты для кастомного выезжающего меню выбора select -->
+<!-- скрипты для кастомного всплывающего меню выбора select -->
 <script type="text/javascript" th:src="@{/js/jquery.js}"></script>
 <script type="text/javascript" th:src="@{/js/jquery.nice-select.js}"></script>
 <script type="text/javascript" th:src="@{/js/customSelect.js}"></script>

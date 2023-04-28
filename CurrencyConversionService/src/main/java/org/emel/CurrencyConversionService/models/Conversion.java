@@ -12,16 +12,10 @@ public class Conversion {
     private long quantity;
     private BigDecimal totalResult;
     private String convertedAt;
+    private String error;
 
     public Conversion() {
 
-    }
-
-    public Conversion(String fromCurrency, String toCurrency, double currencyRate, long quantity) {
-        this.fromCurrency = fromCurrency;
-        this.toCurrency = toCurrency;
-        this.currencyRate = currencyRate;
-        this.quantity = quantity;
     }
 
     public String getFromCurrency() {
@@ -70,5 +64,13 @@ public class Conversion {
 
     public void setConvertedAt(String convertedAt) {
         this.convertedAt = convertedAt;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }
