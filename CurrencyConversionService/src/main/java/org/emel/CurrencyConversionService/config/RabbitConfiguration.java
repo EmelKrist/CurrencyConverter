@@ -2,6 +2,7 @@ package org.emel.CurrencyConversionService.config;
 
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -26,31 +27,24 @@ public class RabbitConfiguration{
     @Value("${spring.rabbitmq.password}")
     private String password;
 
-    @Value("${spring.rabbitmq.virtual-host}")
-    private String virtualHost;
-
     @Value("${spring.rabbitmq.queue-name}")
     private String queue;
 
-    @Value("${spring.rabbitmq.exchange-name}")
-    private String exchange;
+    @Value("${spring.rabbitmq.virtual-host}")
+    private String virtualHost;
 
-    @Value("${spring.rabbitmq.routing-key-name}")
-    private String routingKey;
+    @Value("${spring.rabbitmq.port}")
+    private int port;
 
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory =
                 new CachingConnectionFactory(hostname);
+        connectionFactory.setPort(port);
         connectionFactory.setUsername(username);
         connectionFactory.setPassword(password);
         connectionFactory.setVirtualHost(virtualHost);
         return connectionFactory;
-    }
-
-    @Bean
-    public AmqpAdmin amqpAdmin() {
-        return new RabbitAdmin(connectionFactory());
     }
 
     @Bean
@@ -59,20 +53,11 @@ public class RabbitConfiguration{
     }
 
     @Bean
-    DirectExchange exchange(){
-        return new DirectExchange(exchange, true, false);
-    }
-
-    @Bean
-    Binding binding(Queue queue, DirectExchange exchange){
-        return BindingBuilder.bind(queue).to(exchange).with(routingKey);
-    }
-
-    @Bean
-    public RabbitTemplate rabbitTemplate() {
-        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
-        rabbitTemplate.setDefaultReceiveQueue(queue);
-        return rabbitTemplate;
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory());
+        factory.setMissingQueuesFatal(false);
+        return factory;
     }
 
 }
