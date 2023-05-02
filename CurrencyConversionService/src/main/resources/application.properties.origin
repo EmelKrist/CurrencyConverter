@@ -1,0 +1,15 @@
+# REST API for exchange rates
+exchange.rate.api.url=https://api.coingate.com/api/v2/rates/merchant
+
+# server configuration
+server.port=
+
+# RabbitMQ configuration
+spring.rabbitmq.host=
+spring.rabbitmq.port=
+spring.rabbitmq.username=
+spring.rabbitmq.password=
+spring.rabbitmq.virtual-host=
+spring.rabbitmq.queue-name=
+spring.rabbitmq.exchange-name=
+spring.rabbitmq.routing-key-name=

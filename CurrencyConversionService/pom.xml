@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.emel</groupId>
 	<artifactId>CurrencyConversionService</artifactId>
-	<version>1.0.0</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>CurrencyConversionService</name>
 	<description>Currency conversion service</description>
 	<properties>

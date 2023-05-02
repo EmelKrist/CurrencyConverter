@@ -18,7 +18,6 @@ import org.springframework.web.client.UnknownHttpStatusCodeException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -27,7 +26,6 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class ConversionsService {
     private final Logger log = LoggerFactory.getLogger(ConversionsService.class);
-
     @Value("${exchange.rate.api.url}")
     private String url;
     private final ModelMapper modelMapper;
@@ -45,6 +43,7 @@ public class ConversionsService {
      */
     @RabbitListener(queues = "ccQueue")
     public String process(String message) throws JsonProcessingException {
+
         ConversionInputDataDTO conversionInputDataDTO = new ObjectMapper().readValue(message, ConversionInputDataDTO.class);
         Conversion conversion = convert(convertToConversion(conversionInputDataDTO));
         return new ObjectMapper().writeValueAsString(conversion);
@@ -71,8 +70,7 @@ public class ConversionsService {
             if (rate != null) {
                 conversion.setCurrencyRate(Double.parseDouble(rate));
                 conversion.setTotalResult(calcConversionResult(conversion.getCurrencyRate(), conversion.getQuantity()));
-                conversion.setConvertedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow"))
-                          .format(DateTimeFormatter.ofPattern("HH:mm")) + " MSK");
+                conversion.setConvertedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy")));
             } else {
                 log.debug("Failed to get data from Coingate REST API");
                 conversion.setError("Выбранная валютная ставка не поддерживается!");
