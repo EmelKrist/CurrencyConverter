@@ -38,10 +38,14 @@ public class RabbitConfiguration{
     @Value("${spring.rabbitmq.routing-key-name}")
     private String routingKey;
 
+    @Value("${spring.rabbitmq.port}")
+    private int port;
+
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory =
                 new CachingConnectionFactory(hostname);
+        connectionFactory.setPort(port);
         connectionFactory.setUsername(username);
         connectionFactory.setPassword(password);
         connectionFactory.setVirtualHost(virtualHost);
@@ -72,7 +76,8 @@ public class RabbitConfiguration{
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
         rabbitTemplate.setDefaultReceiveQueue(queue);
-        // TODO сделать обработкчик ошибок ответа (reply error handler)
+        rabbitTemplate.setExchange(exchange);
+        rabbitTemplate.setRoutingKey(routingKey);
         return rabbitTemplate;
     }
 

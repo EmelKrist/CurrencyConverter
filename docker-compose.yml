@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    container_name: currency-convertion-rabbitmq
+    image: rabbitmq:latest
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+      RABBITMQ_DEFAULT_VHOST: ccVH
+
+  postgres:
+    container_name: currency-convertion-postgres
+    image: postgres:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 895271
+      POSTGRES_DB: service_client_db
+    volumes:
+      - ./currencies_dump.sql:/docker-entrypoint-initdb.d/currencies_dump.sql
+
+  client:
+    container_name: currency-convertion-client
+    build: ./ClientService
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/service_client_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 895271
+      SPRING_RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: password
+      RABBITMQ_VHOST: ccVH
+      RABBITMQ_QUEUE: ccQueue
+      RABBITMQ_EXCHANGE: ccExchange
+      RABBITMQ_ROUTING_KEY: ccRoutingKey
+
+  service:
+    container_name: currency-convertion-service
+    build: ./CurrencyConversionService
+    restart: always
+    depends_on:
+      - client
+      - postgres
+      - rabbitmq
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: password
+      RABBITMQ_VHOST: ccVH
+      RABBITMQ_QUEUE: ccQueue
+
+
+
+

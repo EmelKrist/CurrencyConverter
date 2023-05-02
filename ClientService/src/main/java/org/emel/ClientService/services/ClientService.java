@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,6 +19,12 @@ public class ClientService {
     private String serviceError;
     private final Logger log = LoggerFactory.getLogger(ClientService.class);
     private final RabbitTemplate rabbitTemplate;
+
+    @Value("${spring.rabbitmq.exchange-name}")
+    private String exchange;
+
+    @Value("${spring.rabbitmq.routing-key-name}")
+    private String routingKey;
 
     @Autowired
     public ClientService(RabbitTemplate rabbitTemplate) {
@@ -34,8 +41,7 @@ public class ClientService {
         log.debug("Converts for input: {}", conversionInputDataDTO);
         try {
             String response = (String) rabbitTemplate.convertSendAndReceive(
-                    "ccExchange",
-                    "ccRoutingKey",
+                    exchange, routingKey,
                     new ObjectMapper().writeValueAsString(conversionInputDataDTO));
             Conversion conversionWithResult = new ObjectMapper().readValue(response, Conversion.class);
             // если есть ошибка конвертации, то выбрасываем исключение ConversionException

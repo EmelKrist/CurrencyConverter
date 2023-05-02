@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.emel.ClientService</groupId>
     <artifactId>ClientService</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>ClientService</name>
     <description>Client service</description>
     <properties>
