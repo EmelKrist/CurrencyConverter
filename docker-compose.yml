@@ -3,7 +3,7 @@ version: '3.8'
 services:
   rabbitmq:
     container_name: currency-convertion-rabbitmq
-    image: rabbitmq:latest
+    image: rabbitmq:3-management-alpine
     restart: always
     environment:
       RABBITMQ_DEFAULT_USER: user
@@ -60,7 +60,8 @@ services:
       RABBITMQ_PASS: password
       RABBITMQ_VHOST: ccVH
       RABBITMQ_QUEUE: ccQueue
-
+      RABBITMQ_EXCHANGE: ccExchange
+      RABBITMQ_ROUTING_KEY: ccRoutingKey
 
 
 

@@ -43,8 +43,8 @@ public class RabbitConfiguration{
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory connectionFactory =
-                new CachingConnectionFactory(hostname);
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+        connectionFactory.setHost(hostname);
         connectionFactory.setPort(port);
         connectionFactory.setUsername(username);
         connectionFactory.setPassword(password);
@@ -52,10 +52,10 @@ public class RabbitConfiguration{
         return connectionFactory;
     }
 
-    @Bean
-    public AmqpAdmin amqpAdmin() {
-        return new RabbitAdmin(connectionFactory());
-    }
+    //@Bean
+   // public AmqpAdmin amqpAdmin() {
+      //  return new RabbitAdmin(connectionFactory());
+   // }
 
     @Bean
     public Queue myQueue() {
@@ -64,12 +64,17 @@ public class RabbitConfiguration{
 
     @Bean
     DirectExchange exchange(){
-        return new DirectExchange(exchange, true, false);
+        return new DirectExchange(exchange);
     }
 
     @Bean
     Binding binding(Queue queue, DirectExchange exchange){
         return BindingBuilder.bind(queue).to(exchange).with(routingKey);
+    }
+
+    @Bean
+    public RabbitAdmin rabbitAdmin() {
+        return new RabbitAdmin(connectionFactory());
     }
 
     @Bean

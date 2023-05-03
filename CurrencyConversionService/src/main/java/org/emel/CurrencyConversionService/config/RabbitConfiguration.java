@@ -1,12 +1,14 @@
 package org.emel.CurrencyConversionService.config;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
-import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,10 +38,16 @@ public class RabbitConfiguration{
     @Value("${spring.rabbitmq.port}")
     private int port;
 
+    @Value("${spring.rabbitmq.exchange-name}")
+    private String exchange;
+
+    @Value("${spring.rabbitmq.routing-key-name}")
+    private String routingKey;
+
     @Bean
     public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory connectionFactory =
-                new CachingConnectionFactory(hostname);
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+        connectionFactory.setHost(hostname);
         connectionFactory.setPort(port);
         connectionFactory.setUsername(username);
         connectionFactory.setPassword(password);
@@ -53,11 +61,27 @@ public class RabbitConfiguration{
     }
 
     @Bean
-    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory());
-        factory.setMissingQueuesFatal(false);
-        return factory;
+    DirectExchange exchange(){
+        return new DirectExchange(exchange);
+    }
+
+    @Bean
+    Binding binding(Queue queue, DirectExchange exchange){
+        return BindingBuilder.bind(queue).to(exchange).with(routingKey);
+    }
+
+    @Bean
+    public RabbitAdmin rabbitAdmin() {
+        return new RabbitAdmin(connectionFactory());
+    }
+
+    @Bean
+    public SimpleMessageListenerContainer messageListenerContainer() {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory());
+        container.setQueueNames(queue);
+        container.setAutoStartup(false);
+        return container;
     }
 
 }
