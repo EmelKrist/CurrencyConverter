@@ -29,9 +29,6 @@ public class RabbitConfiguration{
     @Value("${spring.rabbitmq.virtual-host}")
     private String virtualHost;
 
-    @Value("${spring.rabbitmq.queue-name}")
-    private String queue;
-
     @Value("${spring.rabbitmq.exchange-name}")
     private String exchange;
 
@@ -40,6 +37,7 @@ public class RabbitConfiguration{
 
     @Value("${spring.rabbitmq.port}")
     private int port;
+    public static final String QUEUE = "ccQueue";
 
     @Bean
     public ConnectionFactory connectionFactory() {
@@ -52,14 +50,9 @@ public class RabbitConfiguration{
         return connectionFactory;
     }
 
-    //@Bean
-   // public AmqpAdmin amqpAdmin() {
-      //  return new RabbitAdmin(connectionFactory());
-   // }
-
     @Bean
     public Queue myQueue() {
-        return new Queue(queue);
+        return new Queue(QUEUE);
     }
 
     @Bean
@@ -80,7 +73,7 @@ public class RabbitConfiguration{
     @Bean
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
-        rabbitTemplate.setDefaultReceiveQueue(queue);
+        rabbitTemplate.setDefaultReceiveQueue(QUEUE);
         rabbitTemplate.setExchange(exchange);
         rabbitTemplate.setRoutingKey(routingKey);
         return rabbitTemplate;

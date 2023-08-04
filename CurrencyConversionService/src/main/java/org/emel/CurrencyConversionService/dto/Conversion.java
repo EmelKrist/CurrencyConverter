@@ -1,4 +1,4 @@
-package org.emel.CurrencyConversionService.models;
+package org.emel.CurrencyConversionService.dto;
 
 import java.math.BigDecimal;
 

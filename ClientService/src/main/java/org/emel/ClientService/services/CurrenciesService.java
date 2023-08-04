@@ -15,6 +15,7 @@ import java.util.List;
 @Service
 public class CurrenciesService {
     private final CurrenciesRepository currenciesRepository;
+
     @Autowired
     public CurrenciesService(CurrenciesRepository currenciesRepository) {
         this.currenciesRepository = currenciesRepository;
