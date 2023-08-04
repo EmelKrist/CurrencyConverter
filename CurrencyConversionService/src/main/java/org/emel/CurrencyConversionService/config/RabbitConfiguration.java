@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @EnableRabbit
 @Configuration
-public class RabbitConfiguration{
+public class RabbitConfiguration {
 
     @Value("${spring.rabbitmq.host}")
     private String hostname;
@@ -28,9 +28,6 @@ public class RabbitConfiguration{
 
     @Value("${spring.rabbitmq.password}")
     private String password;
-
-    @Value("${spring.rabbitmq.queue-name}")
-    private String queue;
 
     @Value("${spring.rabbitmq.virtual-host}")
     private String virtualHost;
@@ -43,6 +40,8 @@ public class RabbitConfiguration{
 
     @Value("${spring.rabbitmq.routing-key-name}")
     private String routingKey;
+
+    public static final String QUEUE = "ccQueue";
 
     @Bean
     public ConnectionFactory connectionFactory() {
@@ -57,16 +56,16 @@ public class RabbitConfiguration{
 
     @Bean
     public Queue myQueue() {
-        return new Queue(queue);
+        return new Queue(QUEUE);
     }
 
     @Bean
-    DirectExchange exchange(){
+    DirectExchange exchange() {
         return new DirectExchange(exchange);
     }
 
     @Bean
-    Binding binding(Queue queue, DirectExchange exchange){
+    Binding binding(Queue queue, DirectExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(routingKey);
     }
 
@@ -79,7 +78,7 @@ public class RabbitConfiguration{
     public SimpleMessageListenerContainer messageListenerContainer() {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory());
-        container.setQueueNames(queue);
+        container.setQueueNames(QUEUE);
         container.setAutoStartup(false);
         return container;
     }

@@ -4,11 +4,8 @@ package org.emel.CurrencyConversionService.dto;
  * Класс объекта передачи входных данных от клиента
  */
 public class ConversionInputDataDTO {
-
     private String fromCurrency;
-
     private String toCurrency;
-
     private long quantity;
 
     public ConversionInputDataDTO() {

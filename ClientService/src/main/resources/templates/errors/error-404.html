@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Currency converter</title>
     <link th:href="@{css/error.css}" rel="stylesheet">
 </head>
+
 <body>
 <div class="container">
+
     <div class="message">
         <h1>Ой!</h1>
         <h2>Похоже, мы не можем найти нужную вам страницу.</h2>
@@ -16,6 +19,8 @@
     <form th:method="GET" th:action="@{/}">
         <input class="btn" type="submit" value="Главная страница"/>
     </form>
+
 </div>
 </body>
+
 </html>

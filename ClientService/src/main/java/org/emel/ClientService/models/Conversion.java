@@ -16,7 +16,7 @@ public class Conversion {
     private String convertedAt = null;
     private String error = null;
 
-    public Conversion(){
+    public Conversion() {
 
     }
 
@@ -74,5 +74,13 @@ public class Conversion {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    /**
+     * Метод для проверки конвертации на успешность
+     * @return есть ошибки или нет (boolean)
+     */
+    public boolean isSuccessful() {
+        return error == null;
     }
 }

@@ -11,12 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * Сервис для клиента
  */
 @Service
 public class ClientService {
-    private String serviceError;
     private final Logger log = LoggerFactory.getLogger(ClientService.class);
     private final RabbitTemplate rabbitTemplate;
 
@@ -25,6 +26,7 @@ public class ClientService {
 
     @Value("${spring.rabbitmq.routing-key-name}")
     private String routingKey;
+    private String serviceError;
 
     @Autowired
     public ClientService(RabbitTemplate rabbitTemplate) {
@@ -37,26 +39,28 @@ public class ClientService {
      * @param conversionInputDataDTO исходные данные, посылаемые сервису конвертации валют
      * @return объект конвертации с результатом от сервиса конвертации валют
      */
-    public Conversion getConvert(ConversionInputDataDTO conversionInputDataDTO)  {
-        log.debug("Converts for input: {}", conversionInputDataDTO);
+    public Optional<Conversion> execConversion(ConversionInputDataDTO conversionInputDataDTO) {
+        log.info("Converts for input: {}", conversionInputDataDTO);
         try {
+            // делаем запрос к сервису конвертации и получаем ответ через брокер
             String response = (String) rabbitTemplate.convertSendAndReceive(
                     exchange, routingKey,
                     new ObjectMapper().writeValueAsString(conversionInputDataDTO));
-            Conversion conversionWithResult = new ObjectMapper().readValue(response, Conversion.class);
-            // если есть ошибка конвертации, то выбрасываем исключение ConversionException
-            if (conversionWithResult.getError() != null) {
-                throw new ConversionException(conversionWithResult.getError());
+            // получаем объект конвертации с результатом
+            Conversion conversion = new ObjectMapper().readValue(response, Conversion.class);
+            // если конвертация не успешна, то выбрасываем исключение ConversionException
+            if (!conversion.isSuccessful()) {
+                throw new ConversionException(conversion.getError());
             }
-            return conversionWithResult;
-        } catch (ConversionException e){
-            log.debug("Program error because of {}", e.getMessage());
+            return Optional.of(conversion);
+        } catch (ConversionException e) {
+            log.error("Program error because of {}", e.getMessage());
             serviceError = e.getMessage();
         } catch (Exception e) {
-            log.debug("Program error because of {}", e.getMessage());
+            log.error("Program error because of {}", e.getMessage());
             serviceError = "Сервис конвертации валют недоступен!";
         }
-        return null;
+        return Optional.empty();
     }
 
     public String getServiceError() {
