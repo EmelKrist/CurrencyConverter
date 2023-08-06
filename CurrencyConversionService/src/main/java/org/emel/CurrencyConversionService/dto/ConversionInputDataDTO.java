@@ -1,38 +1,17 @@
 package org.emel.CurrencyConversionService.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * Класс объекта передачи входных данных от клиента
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class ConversionInputDataDTO {
     private String fromCurrency;
     private String toCurrency;
     private long quantity;
-
-    public ConversionInputDataDTO() {
-
-    }
-
-    public String getFromCurrency() {
-        return fromCurrency;
-    }
-
-    public void setFromCurrency(String fromCurrency) {
-        this.fromCurrency = fromCurrency;
-    }
-
-    public String getToCurrency() {
-        return toCurrency;
-    }
-
-    public void setToCurrency(String toCurrency) {
-        this.toCurrency = toCurrency;
-    }
-
-    public long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(long quantity) {
-        this.quantity = quantity;
-    }
 }
